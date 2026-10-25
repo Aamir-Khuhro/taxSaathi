@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Price List — TaxSaathi</title>
+<meta name="description" content="Every TaxSaathi service, tier, unit price, add-on and the standard rate card on one page.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a> / Price list</div>
+      <h1>Price list</h1>
+      <p class="lead">Every service, its tiers and criteria, add-ons and our standard rate card. The same list applies to every client.</p>
+      <div class="qp-meta" style="margin-top:16px">
+        <span class="chip">Version <span id="ver"></span></span>
+        <span class="chip chip--muted">Effective from <span id="eff"></span></span>
+        <span class="chip chip--muted">Last reviewed <span id="rev"></span></span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;align-items:center" class="no-print">
+        <div class="search" style="flex:1;min-width:240px">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <label class="sr-only" for="find">Search the price list</label>
+          <input type="search" id="find" placeholder="Search services">
+        </div>
+        <button class="btn btn--primary" onclick="window.print()">Download PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:40px">
+    <div class="wrap">
+      <div class="notice notice--info" style="margin-bottom:28px"><span>ℹ</span><span>Government fees, taxes and stamp duty are <strong>never</strong> part of our fee. They are shown separately and paid at actual cost.</span></div>
+      <div id="list"></div>
+
+      <h2 style="margin-top:48px">Add-ons</h2>
+      <div class="table-wrap"><table><thead><tr><th>Add-on</th><th>What it covers</th><th class="num">Price</th></tr></thead><tbody id="addons"></tbody></table></div>
+
+      <h2 style="margin-top:48px">Standard rate card</h2>
+      <p class="muted">Used for staged work and for jobs that fit no published tier (“Custom scope”). You approve a written scope before any work starts.</p>
+      <div class="table-wrap"><table><thead><tr><th>Item</th><th>Unit</th><th class="num">Rate</th></tr></thead><tbody id="rates"></tbody></table></div>
+      <p class="small muted" style="margin-top:24px">General information only; not a substitute for advice on your specific facts. Prices are reviewed every quarter. See our <a href="policies.html#fees">Fee Transparency Policy</a>.</p>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const P = TS.pricing;
+  ver.textContent = P.version; eff.textContent = P.effectiveFrom; rev.textContent = P.lastReviewed;
+  const models = { tiered: "Tiered", unit: "Per unit", subscription: "Monthly plan" };
+  const draw = (term) => {
+    term = (term || "").toLowerCase();
+    let html = "";
+    TS.parts.forEach(p => {
+      const svcs = TS.services.filter(s => s.part === p.key && (!term || (s.name + p.name).toLowerCase().includes(term)));
+      if (!svcs.length) return;
+      html += `<h2 style="font-size:1.3rem;margin-top:32px">Part ${p.key} · ${p.name}</h2><div class="table-wrap"><table>
+        <thead><tr><th style="width:34%">Service</th><th>Tier / unit and criteria</th><th class="num">Fee</th></tr></thead><tbody>`;
+      svcs.forEach(s => {
+        const items = TS.priceItems(s);
+        items.forEach((t, i) => {
+          html += `<tr>${i === 0 ? `<td rowspan="${items.length}"><a href="service.html?s=${s.id}"><strong>${TS.esc(s.name)}</strong></a><div class="crit">${models[s.model]} · ${TS.esc(s.time)}</div>${s.govFees.length ? `<div class="crit">+ ${TS.esc(s.govFees.join("; "))}</div>` : ""}</td>` : ""}
+            <td><strong>${TS.esc(t.name)}</strong><div class="crit">${TS.esc(t.criteria)}</div></td>
+            <td class="num">${TS.money(t.fee)}${s.model === "subscription" ? '<div class="crit">per month</div>' : s.model === "unit" ? '<div class="crit">per unit</div>' : ""}</td></tr>`;
+        });
+      });
+      html += `</tbody></table></div>`;
+    });
+    list.innerHTML = html || `<p class="muted">Nothing matches “${TS.esc(term)}”.</p>`;
+  };
+  find.addEventListener("input", e => draw(e.target.value));
+  draw();
+  addons.innerHTML = Object.values(TS.addons).map(a => `<tr><td><strong>${a.name}</strong></td><td>${a.desc}</td><td class="num">${TS.money(a.fee)}${a.perUnit ? `<div class="crit">${a.perUnit}</div>` : ""}</td></tr>`).join("");
+  rates.innerHTML = TS.rateCard.map(r => `<tr><td><strong>${r.name}</strong></td><td>${r.unit}</td><td class="num">${TS.money(r.fee)}</td></tr>`).join("");
+});
+</script>
+</body>
+</html>

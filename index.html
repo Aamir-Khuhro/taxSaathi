@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TaxSaathi — Clear tax prices. Same rules for everyone.</title>
+<meta name="description" content="Tax, regulatory and compliance services in Pakistan with published, rule-based prices. NTN, company, sales tax and SRB/PRA registration, tax returns, notice replies and stamp duty.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="hero">
+    <div class="urdu-mark" lang="ur" aria-hidden="true">ٹیکس ساتھی</div>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="label-mono">Tax · Regulatory · Compliance — Karachi, serving all of Pakistan</span>
+          <h1>Clear prices. <mark>Same rules</mark> for everyone.</h1>
+          <p class="lead">Registrations, tax returns, notice replies and stamp duty for individuals, partnerships and small companies. You see how your price is worked out before you pay.</p>
+        </div>
+        <form class="starter" id="starter">
+          <div class="starter-head"><span>Form TS-Q · Instant quote</span><span>No sign-up</span></div>
+          <div class="starter-body">
+            <label for="starter-svc">What do you need help with?</label>
+            <select id="starter-svc"></select>
+            <button class="btn btn--primary" type="submit">Show my price</button>
+          </div>
+          <div class="starter-foot">Same answers → same price. No private discounts.</div>
+        </form>
+      </div>
+      <div class="formula" aria-label="How your price is made">
+        <div><small>Input</small><strong>Your answers</strong><span>Only what decides the tier</span></div>
+        <div class="op">+</div>
+        <div><small>Published</small><strong>Our price rules</strong><span>Tiers, units, stages, add-ons</span></div>
+        <div class="op">=</div>
+        <div><small>Output</small><strong>Your price, with the reason</strong><span>Government fees on separate lines</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="num"><b>01</b>Services</div>
+        <div><h2>Five kinds of help. One way of pricing.</h2><p>Every service shows its tiers, what's included and what isn't.</p></div>
+        <a class="link-arrow" href="services.html">All services</a>
+      </div>
+      <div class="index" id="index"></div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="num"><b>02</b>How it works</div>
+        <div><h2>Three steps. No phone call needed.</h2></div>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Answer a few questions</h3><p>Only the ones that decide your tier or unit price. The price and the reason for it appear straight away.</p></div>
+        <div class="step"><h3>Upload and pay</h3><p>Add documents from your phone; the checklist ticks off as they arrive. Pay by bank transfer, card or mobile wallet.</p></div>
+        <div class="step"><h3>We do the work</h3><p>Updates by email and WhatsApp at each stage, and your filed documents when we're done.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="num"><b>03</b>Fee rules</div>
+        <div><h2>What “transparent pricing” means here.</h2><p>These rules apply to every client, every quote and every invoice.</p></div>
+      </div>
+      <div class="rules">
+        <div class="rule"><h3>Published formula</h3><p>Every tier, unit price, stage and add-on is listed publicly with its criteria.</p></div>
+        <div class="rule"><h3>No private prices</h3><p>No one gets a different price for the same answers. Promotions are public and dated.</p></div>
+        <div class="rule"><h3>Quote before payment</h3><p>A line-by-line breakdown and the reason for your tier, before you pay.</p></div>
+        <div class="rule"><h3>Price lock</h3><p>The price on your accepted quote is the price you pay, even if prices change later.</p></div>
+        <div class="rule"><h3>Changes need your consent</h3><p>If your documents put the job in another tier, work pauses until you accept a revised quote.</p></div>
+        <div class="rule"><h3>Government fees apart</h3><p>Taxes, duty and filing charges sit on separate lines at actual cost — never inside our fee.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="num"><b>04</b>Price list</div>
+        <div><h2>A page from our price list.</h2></div>
+        <a class="link-arrow" href="price-list.html">Full price list</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ref</th><th>Service</th><th>Pricing</th><th class="num">From (PKR)</th></tr></thead>
+          <tbody id="sample-prices"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" data-feature="testimonials">
+    <div class="wrap"><div class="sec-head"><div class="num"><b>—</b>Clients</div><div><h2>What clients say</h2></div></div></div>
+  </section>
+
+  <section class="section section--white">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="num"><b>05</b>Questions</div>
+        <div><h2>Short answers.</h2><p>More in our <a href="faq.html">FAQ</a>.</p></div>
+      </div>
+      <div class="faq" style="max-width:860px;margin-left:auto">
+        <details><summary>Why isn't there one fixed price per service?</summary><div>A simple return and a complicated one can't honestly cost the same. Instead, your price comes from published tiers and criteria — the same rules for everyone.</div></details>
+        <details><summary>Is the tax or duty I owe included in your fee?</summary><div>No. Government taxes, duty and filing charges are always shown on their own lines and paid by you directly.</div></details>
+        <details><summary>What if my documents show something different?</summary><div>We send a revised quote in the correct tier and pause work until you accept it. You never pay more without agreeing first.</div></details>
+        <details><summary>Can I talk to someone first?</summary><div>Yes. Message us on WhatsApp, or book a paid 30-minute consultation.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap">
+      <div class="cta">
+        <div><h2>See your price in under a minute.</h2><p>Choose a service, answer a few questions, get a numbered quote you can download.</p></div>
+        <div class="cta-actions"><a class="btn btn--gold" href="services.html">Get your price</a><a class="btn btn--light" id="cta-wa" href="#" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sel = document.getElementById("starter-svc");
+  sel.innerHTML = TS.parts.map(p => `<optgroup label="${p.key}. ${p.name}">${TS.services.filter(s => s.part === p.key).map(s => `<option value="${s.id}">${TS.esc(s.name)}</option>`).join("")}</optgroup>`).join("");
+  document.getElementById("starter").addEventListener("submit", e => { e.preventDefault(); location.href = "service.html?s=" + sel.value; });
+
+  document.getElementById("index").innerHTML = TS.indexHTML();
+
+  const models = { tiered: "Tiered", unit: "Per unit", subscription: "Monthly plan" };
+  document.getElementById("sample-prices").innerHTML = ["individual-ntn", "income-tax-return", "monthly-sales-tax-returns", "notice-reply", "stamp-duty-challan"]
+    .map(id => TS.service(id)).map(s => { const n = TS.services.filter(x => x.part === s.part).indexOf(s) + 1;
+      return `<tr><td class="mono">${s.part}.${String(n).padStart(2, "0")}</td><td><a href="service.html?s=${s.id}"><strong>${s.name}</strong></a></td><td>${models[s.model]}</td><td class="num">${TS.money(TS.fromPrice(s))}</td></tr>`; }).join("");
+  document.getElementById("cta-wa").href = TS.waLink();
+});
+</script>
+</body>
+</html>

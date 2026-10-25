@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service — TaxSaathi</title>
+<meta name="description" content="Published price, what you'll need and how it works.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  @media print {
+    body.print-quote .svc-main, body.print-quote .page-head { display: none !important; }
+    body.print-quote .svc-layout { display: block; }
+    body.print-quote .qp-body { display: none; }
+  }
+</style>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a> / <a href="services.html">Services</a> / <span id="crumb-part"></span></div>
+      <h1 id="svc-name"></h1>
+      <p class="lead" id="svc-summary"></p>
+      <div class="qp-meta" id="svc-meta"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:40px">
+    <div class="wrap svc-layout">
+      <div class="svc-main">
+        <div class="svc-section">
+          <h2 id="tiers-title"><span class="n">01</span> Published prices</h2>
+          <div class="tiers" id="tiers"></div>
+          <p class="small muted" id="unit-note" style="margin-top:12px"></p>
+        </div>
+        <div class="svc-section">
+          <h2><span class="n">02</span> What you will need</h2>
+          <ul class="checklist" id="checklist"></ul>
+        </div>
+        <div class="svc-section">
+          <h2><span class="n">03</span> How it works</h2>
+          <ol class="process" id="process"></ol>
+        </div>
+        <div class="svc-section" id="addons-wrap">
+          <h2><span class="n">04</span> Add-ons</h2>
+          <div class="table-wrap"><table><thead><tr><th>Add-on</th><th class="num">Price</th></tr></thead><tbody id="addons"></tbody></table></div>
+        </div>
+        <div class="svc-section">
+          <h2><span class="n">05</span> Frequently asked questions</h2>
+          <div class="faq" id="faqs"></div>
+        </div>
+        <div class="disclaimer-box">
+          <p><strong>General information only;</strong> not a substitute for advice on your specific facts.</p>
+          <p style="margin:0">Prices last reviewed: <span id="reviewed"></span> · Price rules version <span id="version"></span></p>
+        </div>
+      </div>
+
+      <aside class="svc-aside">
+        <div class="quote-panel" id="quote-panel">
+          <div class="qp-head"><h2>Get your price</h2><p>Form TS-Q</p></div>
+          <form class="qp-body" id="qform" onsubmit="return false"></form>
+          <div class="qp-result" id="qresult" aria-live="polite"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const svc = TS.service(TS.qs("s")) || TS.services[0];
+  const part = TS.part(svc.part);
+  const E = (id) => document.getElementById(id);
+  document.title = `${svc.name} — TaxSaathi`;
+  E("crumb-part").textContent = `${part.name}`;
+  E("svc-name").textContent = svc.name;
+  E("svc-summary").textContent = svc.summary;
+  const modelLabel = { tiered: "Tiered price", unit: "Per-unit price", subscription: "Monthly plan" }[svc.model];
+  E("svc-meta").innerHTML = `<span class="chip">${modelLabel}</span><span class="chip chip--muted">Time: ${TS.esc(svc.time)}</span><span class="chip chip--muted">Part ${part.key} · ${part.name}</span>`;
+  E("reviewed").textContent = TS.pricing.lastReviewed;
+  E("version").textContent = TS.pricing.version;
+
+  // Main column
+  E("tiers-title").innerHTML = '<span class="n">01</span> ' + (svc.model === "unit" ? "Unit prices" : svc.model === "subscription" ? "Monthly plans" : "Price tiers");
+  const renderTiers = (active) => {
+    E("tiers").innerHTML = TS.priceItems(svc).map((t, i) => `<div class="tier${active === t.key ? " active" : ""}">
+      <h4>${TS.esc(t.name)}</h4><div class="t-price">${TS.money(t.fee)}${svc.model === "subscription" ? '<span class="small muted"> /month</span>' : ""}</div><p>${TS.esc(t.criteria)}</p></div>`).join("");
+  };
+  renderTiers();
+  E("unit-note").textContent = svc.unitNote || (svc.model !== "unit" ? "Your tier is the highest tier any of your answers points to." : "");
+  E("checklist").innerHTML = svc.checklist.map(c => `<li>${TS.esc(c)}</li>`).join("");
+  E("process").innerHTML = svc.process.map(([t, d]) => `<li><strong>${TS.esc(t)}</strong><span>${TS.esc(d)}</span></li>`).join("");
+  if (!svc.addons.length) E("addons-wrap").remove();
+  else E("addons").innerHTML = svc.addons.map(k => { const a = TS.addons[k];
+    return `<tr><td><strong>${a.name}</strong><div class="crit">${a.desc}</div></td><td class="num">${TS.money(a.fee)}${a.perUnit ? `<div class="crit">${a.perUnit}</div>` : ""}</td></tr>`; }).join("");
+  E("faqs").innerHTML = svc.faqs.map(([q, a]) => `<details><summary>${TS.esc(q)}</summary><div>${TS.esc(a)}</div></details>`).join("");
+
+  // Quote panel
+  const answers = {};
+  E("qform").innerHTML = svc.questions.map(q => {
+    if (q.type === "number") return `<div class="field"><label for="q-${q.id}">${q.label}</label><input type="number" id="q-${q.id}" data-q="${q.id}" min="${q.min}" max="${q.max}" value="${q.min}" inputmode="numeric"></div>`;
+    if (q.type === "date") return `<div class="field"><label for="q-${q.id}">${q.label}</label><input type="date" id="q-${q.id}" data-q="${q.id}"><span class="hint">We plan the work backwards from this date.</span></div>`;
+    return `<fieldset class="field" style="border:0;padding:0;margin:0 0 16px"><legend class="label" style="font-weight:700;font-size:.9rem;margin-bottom:6px">${q.label}</legend>
+      ${q.help ? `<span class="hint" style="display:block;margin-bottom:6px">${q.help}</span>` : ""}
+      <div class="choice-group">${q.options.map((o, i) => `<label class="choice"><input type="radio" name="${q.id}" value="${i}" data-q="${q.id}"><span class="c-main">${TS.esc(o.label)}</span></label>`).join("")}</div></fieldset>`;
+  }).join("");
+  svc.questions.filter(q => q.type === "number").forEach(q => answers[q.id] = q.min);
+
+  let qno = null;
+  const render = () => {
+    const q = TS.computeQuote(svc, answers, []);
+    const R = E("qresult");
+    let pre = "";
+    if (svc.intake === "notice" && answers.deadline) {
+      const d = TS.daysUntil(answers.deadline);
+      const nice = new Date(answers.deadline + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+      pre += `<div class="deadline-box">Response deadline<strong>${nice}</strong>${d < 0 ? "This date has passed — contact us today." : d === 0 ? "Due today." : `${d} day${d === 1 ? "" : "s"} left.`}</div>`;
+      if (d <= 7) pre += `<div class="urgent">⚑ <span>Deadline within 7 days. Your matter will be flagged to the owner as soon as you submit it. Consider adding Urgent handling.</span></div>`;
+    }
+    if (!q.complete) {
+      renderTiers();
+      R.innerHTML = pre + `<p class="muted small" style="margin:0">Answer the questions above to see your price, the reason for it, and what's included.</p>`;
+      qno = null;
+      return;
+    }
+    renderTiers(q.item.key);
+    qno = qno || TS.quoteNumber();
+    const inputs = TS.encodeInputs({ s: svc.id, a: answers });
+    R.innerHTML = pre + `
+      <div class="print-only"><strong>TaxSaathi</strong> · ${TS.business.phone} · ${TS.business.email}<br>${TS.esc(svc.name)}</div>
+      <div class="qp-top"><div><span class="label-mono" style="margin:0">Quote ${qno}</span><div class="qp-meta" style="margin-top:6px"><span class="chip chip--gold">Valid until ${TS.validUntil()}</span></div></div>
+        <div class="stamp">${svc.model === "unit" ? "Unit" : "Tier"}<b>${TS.esc(q.item.name.split(" ")[0].replace("/", ""))}</b>TaxSaathi</div></div>
+      ${q.reasons.map(r => `<p class="reason">${TS.esc(r)}</p>`).join("")}
+      ${TS.linesHTML(q)}
+      <p class="small muted" style="margin:10px 0 0">Estimated time: ${TS.esc(svc.time)}</p>
+      <div class="inc-exc">
+        <div class="inc"><strong>Included</strong><ul>${svc.included.map(x => `<li>${TS.esc(x)}</li>`).join("")}</ul></div>
+        <div class="exc"><strong>Not included</strong><ul>${svc.excluded.map(x => `<li>${TS.esc(x)}</li>`).join("")}</ul></div>
+      </div>
+      <div class="qp-actions no-print">
+        <a class="btn btn--primary btn--block" href="order.html?q=${encodeURIComponent(inputs)}&n=${qno}">Order now</a>
+        <div class="row">
+          <button class="btn btn--ghost btn--sm" type="button" id="dl">Download PDF</button>
+          <a class="btn btn--ghost btn--sm" id="em" href="#">Email quote</a>
+        </div>
+        <a class="small center" href="${TS.waLink(`Hi TaxSaathi, I have a question about ${svc.name} (quote ${qno}).`)}" target="_blank" rel="noopener">Ask a question first</a>
+      </div>
+      <p class="small muted print-only">General information only; not a substitute for advice on your specific facts.</p>`;
+    E("dl").onclick = () => { document.body.classList.add("print-quote"); window.print(); document.body.classList.remove("print-quote"); };
+    const body = [`TaxSaathi quote ${qno} (valid until ${TS.validUntil()})`, svc.name, ...q.reasons, "",
+      ...q.lines.map(l => `${l.label}: ${TS.moneyText(l.amount)}`), ...q.govLines.map(g => `${g}: at cost, paid separately`),
+      `Our fee: ${TS.moneyText(q.total)}`, "", location.href].join("\n");
+    E("em").href = `mailto:?subject=${encodeURIComponent("TaxSaathi quote " + qno)}&body=${encodeURIComponent(body)}`;
+  };
+  E("qform").addEventListener("input", (e) => {
+    const k = e.target.dataset.q; if (!k) return;
+    answers[k] = e.target.type === "radio" ? Number(e.target.value) : e.target.value;
+    qno = null;
+    render();
+  });
+  render();
+});
+</script>
+</body>
+</html>

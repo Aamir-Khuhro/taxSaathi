@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Services — TaxSaathi</title>
+<meta name="description" content="Registrations, tax returns, notice replies, consultations and stamp duty services with published prices.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a> / Services</div>
+      <h1>Services</h1>
+      <p class="lead">Choose a service to see its published prices and get your own quote in under a minute.</p>
+      <div class="search no-print" style="margin-top:20px">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <label class="sr-only" for="find">Search services</label>
+        <input type="search" id="find" placeholder="Search, e.g. NTN, SRB, notice, stamp">
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:40px">
+    <div class="wrap"><div class="index" id="list"></div></div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const draw = (term) => {
+    document.getElementById("list").innerHTML = TS.indexHTML(term) || `<p class="muted">No service matches “${TS.esc(term)}”. <a href="contact.html">Ask us</a> — we may still be able to help.</p>`;
+  };
+  document.getElementById("find").addEventListener("input", e => draw(e.target.value));
+  draw();
+});
+</script>
+</body>
+</html>

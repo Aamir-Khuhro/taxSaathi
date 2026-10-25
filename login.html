@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client Login — TaxSaathi</title>
+<meta name="description" content="Sign in to your TaxSaathi client portal.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <div class="crumbs"><a href="index.html">Home</a> / Client Login</div>
+  <h1>Client login</h1>
+  <p class="lead">Track your orders, download documents and message us securely.</p>
+</div></section>
+<section class="section" style="padding-top:40px">
+  <div class="wrap" style="max-width:520px">
+    <div class="panel">
+      <div class="notice notice--info" style="margin-bottom:20px"><span>ℹ</span><span>The client portal is coming soon. Until then, you'll get order updates by email and WhatsApp.</span></div>
+      <div class="field"><label for="l-email">Email or mobile</label><input type="text" id="l-email" disabled></div>
+      <div class="field"><label for="l-pass">Password</label><input type="text" id="l-pass" disabled></div>
+      <button class="btn btn--primary btn--block" disabled>Sign in</button>
+      <p class="small muted center" style="margin-top:16px">Need help with an order? <a id="l-wa" target="_blank" rel="noopener">Message us on WhatsApp</a></p>
+    </div>
+  </div>
+</section>
+</main>
+<div id="site-footer"></div>
+<script>document.addEventListener("DOMContentLoaded", () => { document.getElementById("l-wa").href = TS.waLink(); });</script>
+</body>
+</html>
