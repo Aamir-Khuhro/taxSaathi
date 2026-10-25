@@ -1,0 +1,16 @@
+<!-- title: Client Login -->
+<!-- h1: Client login -->
+<!-- desc: Sign in to your TaxSaathi client portal. -->
+<!-- lead: Track your orders, download documents and message us securely. -->
+<section class="section" style="padding-top:40px">
+  <div class="wrap" style="max-width:520px">
+    <div class="panel">
+      <div class="notice notice--info" style="margin-bottom:20px"><span>ℹ</span><span>The client portal is coming soon. Until then, you'll get order updates by email and WhatsApp.</span></div>
+      <div class="field"><label for="l-email">Email or mobile</label><input type="text" id="l-email" disabled></div>
+      <div class="field"><label for="l-pass">Password</label><input type="text" id="l-pass" disabled></div>
+      <button class="btn btn--primary btn--block" disabled>Sign in</button>
+      <p class="small muted center" style="margin-top:16px">Need help with an order? <a id="l-wa" target="_blank" rel="noopener">Message us on WhatsApp</a></p>
+    </div>
+  </div>
+</section>
+<script>document.addEventListener("DOMContentLoaded", () => { document.getElementById("l-wa").href = TS.waLink(); });</script>

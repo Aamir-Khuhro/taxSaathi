@@ -1,0 +1,42 @@
+<!-- title: Contact -->
+<!-- h1: Contact us -->
+<!-- desc: Contact TaxSaathi in Karachi by WhatsApp, phone or email. -->
+<!-- lead: The fastest way to reach us is WhatsApp. For a price, you don't need to contact us at all — every service page shows it. -->
+<section class="section" style="padding-top:40px">
+  <div class="wrap grid grid-2" style="gap:32px;align-items:start">
+    <div class="grid" style="gap:16px">
+      <a class="card" id="c-wa" target="_blank" rel="noopener"><h3>WhatsApp</h3><p style="margin:0"><span class="b-phone"></span> · usually the quickest reply</p></a>
+      <a class="card" id="c-tel"><h3>Phone</h3><p style="margin:0" class="b-phone"></p></a>
+      <a class="card" id="c-mail"><h3>Email</h3><p style="margin:0" id="b-email"></p></a>
+      <div class="card"><h3>Office</h3><p id="b-addr"></p><a class="link-arrow" id="c-map" target="_blank" rel="noopener">Open in Google Maps</a></div>
+    </div>
+    <form class="panel" id="contact-form">
+      <h2>Send a message</h2>
+      <div class="field"><label for="cf-name">Name</label><input type="text" id="cf-name" required autocomplete="name"></div>
+      <div class="field"><label for="cf-phone">Mobile / WhatsApp</label><input type="tel" id="cf-phone" autocomplete="tel"></div>
+      <div class="field"><label for="cf-email">Email</label><input type="email" id="cf-email" autocomplete="email"></div>
+      <div class="field"><label for="cf-topic">Topic</label><select id="cf-topic"><option>General question</option><option>I received a notice</option><option>A service not listed</option><option>Something else</option></select></div>
+      <div class="field"><label for="cf-msg">Message</label><textarea id="cf-msg" required></textarea><span class="hint">Please don't send passwords or confidential documents here.</span></div>
+      <button class="btn btn--primary btn--block" type="submit">Send message</button>
+      <p class="small muted" style="margin:12px 0 0">This opens your email app with the message filled in.</p>
+    </form>
+  </div>
+</section>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const B = TS.business;
+  document.querySelectorAll(".b-phone").forEach(e => e.textContent = B.phone);
+  document.getElementById("b-email").textContent = B.email;
+  document.getElementById("b-addr").textContent = B.address;
+  document.getElementById("c-wa").href = TS.waLink();
+  document.getElementById("c-tel").href = "tel:+" + B.phoneIntl;
+  document.getElementById("c-mail").href = "mailto:" + B.email;
+  document.getElementById("c-map").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Idara Maarif-ul-Quran, Kashmir Colony, Korangi Road, Karachi");
+  document.getElementById("contact-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = id => document.getElementById(id).value;
+    const body = `${v("cf-msg")}\n\n${v("cf-name")}\n${v("cf-phone")}\n${v("cf-email")}`;
+    location.href = `mailto:${B.email}?subject=${encodeURIComponent("Website: " + v("cf-topic"))}&body=${encodeURIComponent(body)}`;
+  });
+});
+</script>

@@ -1,0 +1,65 @@
+<!-- title: Free Tools -->
+<!-- h1: Free tools -->
+<!-- desc: Free statutory deadline calendar and downloadable document checklists for Pakistani tax and compliance. -->
+<!-- lead: Free to use, no sign-up. Plan your deadlines and gather the right documents before you start. -->
+<section class="section" style="padding-top:40px">
+  <div class="wrap">
+    <div class="tabs no-print" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="cal">Deadline calendar</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="chk">Document checklists</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="calc">Stamp duty calculator</button>
+    </div>
+
+    <div data-panel="cal">
+      <div class="notice" style="margin-bottom:20px"><span>⚠</span><span><strong>Indicative dates.</strong> Due dates can change by notification or extension. Always confirm the current date for your case. <span class="placeholder">[Owner to verify before launch]</span></span></div>
+      <div class="tabs no-print" id="auth-filter"></div>
+      <div class="deadlines" id="deadlines"></div>
+    </div>
+
+    <div data-panel="chk" class="hidden">
+      <p class="muted">Pick a service to see and print its document checklist.</p>
+      <div class="field no-print" style="max-width:520px"><label for="chk-svc">Service</label><select id="chk-svc"></select></div>
+      <div class="panel">
+        <h2 id="chk-title" style="font-size:1.3rem"></h2>
+        <ul class="checklist" id="chk-list"></ul>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px" class="no-print">
+          <button class="btn btn--primary" onclick="window.print()">Download / print checklist</button>
+          <a class="btn btn--ghost" id="chk-go" href="#">Get a price for this service</a>
+        </div>
+        <p class="small muted print-only">TaxSaathi · General information only; not a substitute for advice on your specific facts.</p>
+      </div>
+    </div>
+
+    <div data-panel="calc" class="hidden">
+      <div class="card" style="max-width:640px"><div class="icon-badge">%</div><h3>Indicative stamp duty calculator — coming soon</h3>
+        <p>A free calculator for Sindh and Punjab instruments, using rate tables that TaxSaathi keeps up to date. The figure will always be indicative and verified by our staff before any challan is issued.</p>
+        <a class="link-arrow" href="service.html?s=stamp-duty-challan">Need a challan now? See the challan service</a></div>
+    </div>
+  </div>
+</section>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[role=tablist]:not(#auth-filter) .tab").forEach(t => t.addEventListener("click", () => {
+    document.querySelectorAll("[data-tab]").forEach(x => x.setAttribute("aria-selected", x === t));
+    document.querySelectorAll("[data-panel]").forEach(p => p.classList.toggle("hidden", p.dataset.panel !== t.dataset.tab));
+  }));
+  const auths = ["All", ...new Set(TS.deadlines.map(d => d.auth))];
+  const af = document.getElementById("auth-filter");
+  const drawCal = (a) => {
+    af.innerHTML = auths.map(x => `<button class="tab" aria-selected="${x === a}" data-a="${x}">${x}</button>`).join("");
+    document.getElementById("deadlines").innerHTML = TS.deadlines.filter(d => a === "All" || d.auth === a).map(d => `
+      <div class="deadline"><div class="d-date"><b>${d.day}</b><small>${d.when === "Every month" ? "monthly" : d.when === "Quarterly" ? "quarterly" : d.when.slice(0, 3)}</small></div>
+      <div><h4>${d.title}</h4><p>${d.when === "Every month" ? `By the ${d.day}th of every month · ` : d.when === "Quarterly" ? `By the ${d.day}th after each quarter · ` : `${d.day} ${d.when} · `}${d.note}</p></div></div>`).join("");
+  };
+  af.addEventListener("click", e => { if (e.target.dataset.a) drawCal(e.target.dataset.a); });
+  drawCal("All");
+
+  const sel = document.getElementById("chk-svc");
+  sel.innerHTML = TS.services.map(s => `<option value="${s.id}">${TS.esc(s.name)}</option>`).join("");
+  const drawChk = () => { const s = TS.service(sel.value);
+    document.getElementById("chk-title").textContent = "Checklist: " + s.name;
+    document.getElementById("chk-list").innerHTML = s.checklist.map(c => `<li>${TS.esc(c)}</li>`).join("");
+    document.getElementById("chk-go").href = "service.html?s=" + s.id; };
+  sel.addEventListener("change", drawChk); drawChk();
+});
+</script>
