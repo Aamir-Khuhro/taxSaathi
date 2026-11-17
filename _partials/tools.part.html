@@ -1,12 +1,12 @@
 <!-- title: Free Tools -->
 <!-- h1: Free tools -->
-<!-- desc: Free statutory deadline calendar and downloadable document checklists for Pakistani tax and compliance. -->
+<!-- desc: Free statutory deadline calendar, lists of documents to provide, and a Sindh stamp duty calculator. -->
 <!-- lead: Free to use, no sign-up. Plan your deadlines and gather the right documents before you start. -->
 <section class="section" style="padding-top:40px">
   <div class="wrap">
     <div class="tabs no-print" role="tablist">
       <button class="tab" role="tab" aria-selected="true" data-tab="cal">Deadline calendar</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="chk">Document checklists</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="chk">Documents to provide</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="calc">Stamp duty calculator</button>
     </div>
 
@@ -17,13 +17,13 @@
     </div>
 
     <div data-panel="chk" class="hidden">
-      <p class="muted">Pick a service to see and print its document checklist.</p>
+      <p class="muted">Pick a service to see and print the documents you will provide for it.</p>
       <div class="field no-print" style="max-width:520px"><label for="chk-svc">Service</label><select id="chk-svc"></select></div>
       <div class="panel">
         <h2 id="chk-title" style="font-size:1.3rem"></h2>
         <ul class="checklist" id="chk-list"></ul>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px" class="no-print">
-          <button class="btn btn--primary" onclick="window.print()">Download / print checklist</button>
+          <button class="btn btn--primary" onclick="window.print()">Download / print list</button>
           <a class="btn btn--ghost" id="chk-go" href="#">Get a price for this service</a>
         </div>
         <p class="small muted print-only">TaxSaathi · General information only; not a substitute for advice on your specific facts.</p>
@@ -31,9 +31,23 @@
     </div>
 
     <div data-panel="calc" class="hidden">
-      <div class="card" style="max-width:640px"><div class="icon-badge">%</div><h3>Indicative stamp duty calculator — coming soon</h3>
-        <p>A free calculator for Sindh and Punjab instruments, using rate tables that TaxSaathi keeps up to date. The figure will always be indicative and verified by our staff before any challan is issued.</p>
-        <a class="link-arrow" href="service.html?s=stamp-duty-challan">Need a challan now? See the challan service</a></div>
+      <div class="svc-layout" style="gap:32px">
+        <div>
+          <div class="panel">
+            <h2 style="font-size:1.4rem">Sindh stamp duty calculator</h2>
+            <p class="muted small">Pick the document, enter the value, and see the duty with the article of the schedule it comes from.</p>
+            <div class="field"><label for="sd-ins">Type of document</label><select id="sd-ins"></select></div>
+            <div id="sd-inputs"></div>
+          </div>
+          <p class="small muted" style="margin-top:14px" id="sd-src"></p>
+        </div>
+        <aside>
+          <div class="quote-panel">
+            <div class="qp-head"><h2>Indicative duty</h2><p>Sindh</p></div>
+            <div class="qp-result" style="border-top:0" id="sd-out" aria-live="polite"></div>
+          </div>
+        </aside>
+      </div>
     </div>
   </div>
 </section>
@@ -57,9 +71,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const sel = document.getElementById("chk-svc");
   sel.innerHTML = TS.services.map(s => `<option value="${s.id}">${TS.esc(s.name)}</option>`).join("");
   const drawChk = () => { const s = TS.service(sel.value);
-    document.getElementById("chk-title").textContent = "Checklist: " + s.name;
+    document.getElementById("chk-title").textContent = "Documents to provide: " + s.name;
     document.getElementById("chk-list").innerHTML = s.checklist.map(c => `<li>${TS.esc(c)}</li>`).join("");
     document.getElementById("chk-go").href = "service.html?s=" + s.id; };
   sel.addEventListener("change", drawChk); drawChk();
+  // Stamp duty calculator (Sindh)
+  const SD = TS.stampDuty.sindh, insSel = document.getElementById("sd-ins");
+  const groups = [...new Set(SD.instruments.map(i => i.group))];
+  insSel.innerHTML = groups.map(g => `<optgroup label="${g}">${SD.instruments.filter(i => i.group === g).map(i => `<option value="${i.id}">${TS.esc(i.name)}</option>`).join("")}</optgroup>`).join("");
+  document.getElementById("sd-src").innerHTML = `Rates: ${TS.esc(SD.source)}. Indicative only: valuation-table values, exemptions and later Finance Act changes can alter the figure. We verify the duty before any challan is issued.`;
+  const num = (id, label, hint) => `<div class="field"><label for="${id}">${label}</label><input type="number" min="0" step="1" inputmode="numeric" id="${id}" placeholder="Rs">${hint ? `<span class="hint">${hint}</span>` : ""}</div>`;
+  const val = (id) => { const e = document.getElementById(id); return e ? e.value : 0; };
+  const drawInputs = () => {
+    const ins = SD.instruments.find(i => i.id === insSel.value);
+    document.getElementById("sd-inputs").innerHTML =
+      ins.kind === "fixed" ? `<p class="small muted">This document carries a fixed duty, whatever its value.</p>` :
+      ins.kind === "lease" ? num("sd-rent", "Monthly rent") + num("sd-months", "Term of the lease (months)") + num("sd-adv", "Advance rent, if any") + num("sd-prem", "Premium / pagri, if any", "Security deposits that are refundable are usually not rent.") :
+      num("sd-val", ins.valueLabel || "Value");
+    calc();
+  };
+  const calc = () => {
+    const ins = SD.instruments.find(i => i.id === insSel.value);
+    const duty = TS.stampCalc(ins, { value: val("sd-val"), rent: val("sd-rent"), months: val("sd-months"), advance: val("sd-adv"), premium: val("sd-prem") });
+    document.getElementById("sd-out").innerHTML = `
+      <span class="label-mono" style="margin:0">Schedule I · Article ${TS.esc(ins.art)}</span>
+      <p class="reason" style="margin-top:12px">${TS.esc(ins.note)}</p>
+      <ul class="lines"><li class="total"><span>Stamp duty</span><span>PKR ${Number(duty).toLocaleString("en-PK")}</span></li></ul>
+      <p class="small muted" style="margin:12px 0 0">Paid by you directly to the Government of Sindh through e-stamping. It is never part of our fee. Registration fee and other charges at the sub-registrar are separate.</p>
+      <div class="qp-actions no-print"><a class="btn btn--primary btn--block" href="service.html?s=stamp-duty-challan">Get the challan prepared</a></div>`;
+  };
+  insSel.addEventListener("change", drawInputs);
+  document.getElementById("sd-inputs").addEventListener("input", calc);
+  drawInputs();
 });
 </script>

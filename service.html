@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Service — TaxSaathi</title>
-<meta name="description" content="Published price, what you'll need and how it works.">
+<meta name="description" content="Published price, the documents you provide and how it works.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -40,7 +40,8 @@
           <p class="small muted" id="unit-note" style="margin-top:12px"></p>
         </div>
         <div class="svc-section">
-          <h2><span class="n">02</span> What you will need</h2>
+          <h2><span class="n">02</span> Documents you will provide</h2>
+          <p class="muted small" style="margin-top:-6px">Upload these with your order. Anything missing can be sent later; we tick each one off as it arrives.</p>
           <ul class="checklist" id="checklist"></ul>
         </div>
         <div class="svc-section">
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   E("svc-name").textContent = svc.name;
   E("svc-summary").textContent = svc.summary;
   const modelLabel = { tiered: "Tiered price", unit: "Per-unit price", subscription: "Monthly plan" }[svc.model];
-  E("svc-meta").innerHTML = `<span class="chip">${modelLabel}</span><span class="chip chip--muted">Time: ${TS.esc(svc.time)}</span><span class="chip chip--muted">Part ${part.key} · ${part.name}</span>`;
+  E("svc-meta").innerHTML = `<span class="chip">${modelLabel}</span><span class="chip chip--gold">${TS.esc(svc.basis || "")}</span><span class="chip chip--muted">Time: ${TS.esc(svc.time)}</span><span class="chip chip--muted">Part ${part.key} · ${part.name}</span>`;
   E("reviewed").textContent = TS.pricing.lastReviewed;
   E("version").textContent = TS.pricing.version;
 

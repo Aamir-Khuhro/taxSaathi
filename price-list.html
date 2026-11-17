@@ -18,7 +18,7 @@
     <div class="wrap">
       <div class="crumbs"><a href="index.html">Home</a> / Price list</div>
       <h1>Price list</h1>
-      <p class="lead">Every service, its tiers and criteria, add-ons and our standard rate card. The same list applies to every client.</p>
+      <p class="lead">Every service, its tiers and criteria, add-ons and our standard rate card. The same list applies to every client, and every figure is our full professional fee.</p>
       <div class="qp-meta" style="margin-top:16px">
         <span class="chip">Version <span id="ver"></span></span>
         <span class="chip chip--muted">Effective from <span id="eff"></span></span>
@@ -37,7 +37,12 @@
 
   <section class="section" style="padding-top:40px">
     <div class="wrap">
-      <div class="notice notice--info" style="margin-bottom:28px"><span>ℹ</span><span>Government fees, taxes and stamp duty are <strong>never</strong> part of our fee. They are shown separately and paid at actual cost.</span></div>
+      <div class="notice notice--info" style="margin-bottom:20px"><span>ℹ</span><span>Government fees, taxes and stamp duty are <strong>never</strong> part of our fee. They are shown separately and paid at actual cost.</span></div>
+      <div class="grid grid-3" style="margin-bottom:12px">
+        <div class="card"><span class="chip">Fixed</span><h3 style="margin-top:12px">Same price for everyone</h3><p>Nil returns, consultations, stamp challans and each stage of an appeal. The price does not depend on your business.</p></div>
+        <div class="card"><span class="chip">Tiered</span><h3 style="margin-top:12px">Set by published criteria</h3><p>Registrations and annual returns. Turnover, transactions, members or assets place the job in Basic, Standard or Complex.</p></div>
+        <div class="card"><span class="chip">By type</span><h3 style="margin-top:12px">Set by notice type</h3><p>Notices are priced by what the notice asks for, from a simple information request to an audit, whichever authority sent it.</p></div>
+      </div>
       <div id="list"></div>
 
       <h2 style="margin-top:48px">Add-ons</h2>
@@ -67,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       svcs.forEach(s => {
         const items = TS.priceItems(s);
         items.forEach((t, i) => {
-          html += `<tr>${i === 0 ? `<td rowspan="${items.length}"><a href="service.html?s=${s.id}"><strong>${TS.esc(s.name)}</strong></a><div class="crit">${models[s.model]} · ${TS.esc(s.time)}</div>${s.govFees.length ? `<div class="crit">+ ${TS.esc(s.govFees.join("; "))}</div>` : ""}</td>` : ""}
+          html += `<tr>${i === 0 ? `<td rowspan="${items.length}"><a href="service.html?s=${s.id}"><strong>${TS.esc(s.name)}</strong></a><div class="crit">${models[s.model]} · ${TS.esc(s.time)}</div>${s.basis ? `<div class="crit"><strong>${TS.esc(s.basis)}</strong></div>` : ""}${s.govFees.length ? `<div class="crit">+ ${TS.esc(s.govFees.join("; "))}</div>` : ""}</td>` : ""}
             <td><strong>${TS.esc(t.name)}</strong><div class="crit">${TS.esc(t.criteria)}</div></td>
             <td class="num">${TS.money(t.fee)}${s.model === "subscription" ? '<div class="crit">per month</div>' : s.model === "unit" ? '<div class="crit">per unit</div>' : ""}</td></tr>`;
         });
@@ -76,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     list.innerHTML = html || `<p class="muted">Nothing matches “${TS.esc(term)}”.</p>`;
   };
-  find.addEventListener("input", e => draw(e.target.value));
+  document.getElementById("find").addEventListener("input", e => draw(e.target.value));
   draw();
   addons.innerHTML = Object.values(TS.addons).map(a => `<tr><td><strong>${a.name}</strong></td><td>${a.desc}</td><td class="num">${TS.money(a.fee)}${a.perUnit ? `<div class="crit">${a.perUnit}</div>` : ""}</td></tr>`).join("");
   rates.innerHTML = TS.rateCard.map(r => `<tr><td><strong>${r.name}</strong></td><td>${r.unit}</td><td class="num">${TS.money(r.fee)}</td></tr>`).join("");

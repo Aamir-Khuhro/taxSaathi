@@ -11,7 +11,7 @@ Then open http://localhost:5173. You can also open `index.html` directly in a br
 ## Where things live
 | File | What it holds |
 |---|---|
-| `assets/js/data.js` | **All prices, tiers, criteria, quote questions, add-ons, rate card, checklists, FAQs and deadlines.** Every `fee: null` shows as "To be set". Put the owner's PKR amounts here. |
+| `assets/js/data.js` | **All prices (PKR, set Nov 2026), tiers, criteria, quote questions, add-ons, rate card, documents to provide, FAQs, deadlines and the Sindh stamp duty rate table.** Edit prices here. |
 | `assets/js/site.js` | Shared header, footer and WhatsApp button, plus the quote engine (`TS.computeQuote`) |
 | `assets/css/style.css` | Design system: brand colours, Manrope, components |
 | `service.html?s=<id>` | One template for every service page, with the "Get your price" panel |
