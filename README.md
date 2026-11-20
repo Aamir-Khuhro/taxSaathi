@@ -33,6 +33,11 @@ Copy `content/knowledge/_template.md`, fill in the header block, write the artic
 3. Optional: add a photo at `assets/img/abdullah.webp` (or `.jpg`); the About page shows it automatically.
 
 ## Hosting (CR-145)
+**Currently on Vercel.** `vercel.json` tells Vercel to run `npm run build`, serve `dist/`,
+redirect the old `.html` addresses (301) and set headers. Push to `main` to deploy.
+Old `service.html?s=<id>` links reach `/services/?s=<id>`, which forwards to the service page.
+
+
 Vercel's free Hobby plan is for personal, non-commercial use, so use a host whose free plan
 allows a business site, such as **Cloudflare Pages** or **Netlify** (check their current terms).
 - Build command `npm run build`, output folder `dist`.
