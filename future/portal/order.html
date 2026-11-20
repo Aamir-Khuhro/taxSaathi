@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order — TaxSaathi</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+  <section class="page-head" style="padding:32px 0 28px">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a> / <a id="back-svc" href="services.html">Service</a> / Order</div>
+      <h1 id="title" style="font-size:clamp(1.5rem,3.6vw,2.2rem)">Your order</h1>
+      <div class="notice" style="margin-top:12px"><span>⚠</span><span><strong>Preview build.</strong> The online order system (accounts, uploads, payments) is not connected yet, so nothing on this page is sent or charged. To order today, message us on WhatsApp.</span></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:32px">
+    <div class="wrap">
+      <ol class="stepper" id="stepper"></ol>
+      <div class="order-layout">
+        <div class="panel" id="step"></div>
+        <aside><div class="panel">
+          <div class="qp-meta"><span class="chip" id="s-tier"></span><span class="chip chip--muted" id="s-no"></span></div>
+          <h3 id="s-name" style="font-size:1.05rem"></h3>
+          <div id="s-reasons"></div>
+          <div id="s-lines"></div>
+          <p class="small muted" style="margin:12px 0 0">Price locked at this quote. Valid until <span id="s-valid"></span>.</p>
+        </div></aside>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const inp = TS.decodeInputs(TS.qs("q") || "");
+  const svc = inp && TS.service(inp.s);
+  const $ = (id) => document.getElementById(id);
+  if (!svc) { $("step").innerHTML = `<h2>Start with a quote</h2><p>Choose a service and answer its questions first.</p><a class="btn btn--primary" href="services.html">Choose a service</a>`; return; }
+  const quoteNo = TS.qs("n") || TS.quoteNumber();
+  const state = { step: 0, addons: [], details: {}, files: {}, intake: {}, accepted: null, pay: null };
+  const STEPS = ["Quote", "Your details", "Documents", "Review", "Pay", "Done"];
+  $("title").textContent = svc.name;
+  $("back-svc").href = `service.html?s=${svc.id}`; $("back-svc").textContent = svc.name.replace(/\s*\(.*\)/, "").replace(/:.*/, "");
+  $("s-name").textContent = svc.name; $("s-no").textContent = "Quote " + quoteNo; $("s-valid").textContent = TS.validUntil();
+
+  const quote = () => TS.computeQuote(svc, inp.a, state.addons);
+  const summary = () => {
+    const q = quote();
+    $("s-tier").textContent = q.item.name;
+    $("s-reasons").innerHTML = q.reasons.map(r => `<p class="reason">${TS.esc(r)}</p>`).join("");
+    $("s-lines").innerHTML = TS.linesHTML(q);
+  };
+
+  const field = (id, label, type = "text", extra = "") => `<div class="field"><label for="${id}">${label}</label><input type="${type}" id="${id}" name="${id}" ${extra}></div>`;
+  const nav = (back, next, nextLabel = "Continue") => `<div class="form-actions">${back ? `<button class="btn btn--ghost" type="button" data-go="-1">Back</button>` : "<span></span>"}<button class="btn btn--primary" type="submit">${nextLabel}</button></div>`;
+
+  const views = [
+    // 0 — quote and add-ons
+    () => `<form><h2>Your quote and add-ons</h2><p class="muted">Add anything you need now. Every add-on has a published price.</p>
+      ${svc.addons.length ? `<div class="choice-group">${svc.addons.map(k => { const a = TS.addons[k]; return `<label class="choice"><input type="checkbox" value="${k}" ${state.addons.includes(k) ? "checked" : ""} data-addon>
+        <span class="c-main"><strong>${a.name}</strong><small>${a.desc}</small></span><span class="c-price">${TS.money(a.fee)}</span></label>`; }).join("")}</div>` : `<p>No add-ons for this service.</p>`}
+      <p class="small muted" style="margin-top:16px">Want different answers? <a href="service.html?s=${svc.id}">Change your quote</a>.</p>${nav(false)}</form>`,
+    // 1 — details
+    () => `<form><h2>Your details</h2><p class="muted">Create an account later or continue with email and phone. We'll verify both.</p>
+      ${field("fullname", "Full name", "text", 'required autocomplete="name"')}
+      ${field("email", "Email", "email", 'required autocomplete="email"')}
+      ${field("phone", "Mobile / WhatsApp number", "tel", 'required autocomplete="tel" placeholder="03xx xxxxxxx"')}
+      ${field("city", "City", "text", 'autocomplete="address-level2"')}
+      ${nav(true)}</form>`,
+    // 2 — documents and intake
+    () => `<form><h2>Documents</h2><p class="muted">PDF, JPG or PNG, up to 10 MB each. The checklist ticks off as files arrive. You can also send missing documents later.</p>
+      ${svc.intake === "notice" ? `<h3 style="margin-top:8px">About the notice</h3>
+        <div class="grid grid-2" style="gap:0 16px">${field("notice_date", "Notice date", "date")}${field("tax_year", "Tax year or period", "text", 'placeholder="e.g. 2025"')}${field("amount", "Amount in dispute (PKR)", "number", 'inputmode="numeric"')}</div>` : ""}
+      ${svc.part === "E" ? `<h3 style="margin-top:8px">About the document</h3>
+        <div class="grid grid-2" style="gap:0 16px">${field("doc_date", "Document date", "date")}${field("value", "Value or consideration (PKR)", "number", 'inputmode="numeric"')}${field("location", "Property location (if any)")}${field("parties", "Names of the parties")}</div>` : ""}
+      <h3 style="margin-top:8px">Checklist</h3>
+      <div style="display:grid;gap:10px">${svc.checklist.map((c, i) => `<label class="upload${state.files[i] ? " done" : ""}">
+        <span><span class="u-name">${state.files[i] ? "✓ " : ""}${TS.esc(c)}</span><span class="u-file">${state.files[i] ? TS.esc(state.files[i]) : "No file yet"}</span></span>
+        <span class="btn btn--ghost btn--sm">${state.files[i] ? "Replace" : "Upload"}</span>
+        <input type="file" accept=".pdf,.jpg,.jpeg,.png" data-file="${i}"></label>`).join("")}</div>
+      ${nav(true)}</form>`,
+    // 3 — review & terms
+    () => { const q = quote(); return `<form><h2>Review your order</h2>
+      ${TS.linesHTML(q)}
+      <div class="notice notice--info" style="margin:16px 0"><span>ℹ</span><span>Government fees listed above are paid by you directly at actual cost. They are not collected with our fee.</span></div>
+      <h3>Engagement terms</h3>
+      <ul class="small" style="color:var(--ink-2)">
+        <li><strong>Scope:</strong> what is listed as included on the service page.</li>
+        <li><strong>Your part:</strong> accurate facts and complete documents.</li>
+        <li><strong>Re-tiering:</strong> if your documents put the job in a different tier, we pause and send a revised quote. Work resumes only after you accept it.</li>
+        <li><strong>Refunds:</strong> as set out in our <a href="policies.html#refund" target="_blank">Refund Policy</a>.</li>
+      </ul>
+      <label class="check" style="margin-top:12px"><input type="checkbox" id="agree" required ${state.accepted ? "checked" : ""}><span>I accept the engagement terms, the <a href="policies.html#terms" target="_blank">Terms of Service</a> and the <a href="policies.html#refund" target="_blank">Refund Policy</a>.</span></label>
+      <p class="small muted">We record the date, time and IP address of your acceptance.</p>
+      ${nav(true, true, "Continue to payment")}</form>`; },
+    // 4 — pay
+    () => `<form><h2>Payment</h2><p class="muted">All amounts are in PKR. Your invoice will match this quote exactly.</p>
+      <div class="choice-group">
+        ${[["bank", "Bank transfer", "Upload proof of payment; we confirm manually."], ["card", "Debit / credit card", "Through our payment gateway."], ["wallet", "JazzCash / Easypaisa", "Mobile wallet through the gateway."], ["raast", "Raast", "Instant bank payment, where available."]]
+          .map(([v, t, d]) => `<label class="choice"><input type="radio" name="pay" value="${v}" required ${state.pay === v ? "checked" : ""}><span class="c-main"><strong>${t}</strong><small>${d}</small></span></label>`).join("")}
+      </div>
+      <p class="small muted" style="margin-top:12px">Our fee: <strong>${TS.moneyText(quote().total)}</strong></p>
+      ${nav(true, true, "Place order")}</form>`,
+    // 5 — done
+    () => { const no = "TSO-" + quoteNo.slice(4); return `<div class="center" style="padding:16px 0">
+      <div class="success-mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></div>
+      <h2>Order received</h2><p class="lead" style="margin:0 auto 8px">Your order number is <strong>${no}</strong>.</p>
+      <p class="muted">In the live site you'll get a confirmation by email and WhatsApp/SMS with this number.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+        <a class="btn btn--primary" href="${TS.waLink(`Hi TaxSaathi, I placed order ${no} for ${svc.name}.`)}" target="_blank" rel="noopener">Message us on WhatsApp</a>
+        <a class="btn btn--ghost" href="index.html">Back to home</a></div></div>`; }
+  ];
+
+  const draw = () => {
+    $("stepper").innerHTML = STEPS.map((s, i) => `<li class="${i < state.step ? "done" : i === state.step ? "current" : ""}">${i + 1}. ${s}</li>`).join("");
+    $("step").innerHTML = views[state.step]();
+    // restore entered values
+    $("step").querySelectorAll("input[name]").forEach(el => { if (el.type !== "radio" && state.details[el.name] != null) el.value = state.details[el.name]; });
+    summary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  $("step").addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.addon != null) { state.addons = [...$("step").querySelectorAll("[data-addon]:checked")].map(x => x.value); summary(); }
+    if (t.dataset.file != null && t.files[0]) {
+      const f = t.files[0];
+      if (f.size > 10 * 1024 * 1024) { alert("That file is over 10 MB. Please upload a smaller file."); return; }
+      state.files[t.dataset.file] = f.name; saveFields(); draw();
+    }
+    if (t.name === "pay") state.pay = t.value;
+    if (t.id === "agree") state.accepted = t.checked ? new Date().toISOString() : null;
+  });
+  const saveFields = () => $("step").querySelectorAll("input[name]").forEach(el => { if (el.type !== "radio") state.details[el.name] = el.value; });
+  $("step").addEventListener("click", (e) => { if (e.target.dataset.go) { saveFields(); state.step--; draw(); } });
+  $("step").addEventListener("submit", (e) => { e.preventDefault(); saveFields(); state.step++; draw(); });
+  draw();
+});
+</script>
+</body>
+</html>

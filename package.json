@@ -1,0 +1,12 @@
+{
+  "name": "taxsaathi-website",
+  "private": true,
+  "description": "TaxSaathi static website. No dependencies.",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "preview": "node scripts/build.js --drafts && node scripts/serve.js",
+    "start": "node scripts/build.js && node scripts/serve.js",
+    "check": "node scripts/build.js --strict"
+  },
+  "engines": { "node": ">=18" }
+}

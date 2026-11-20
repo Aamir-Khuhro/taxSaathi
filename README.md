@@ -1,28 +1,46 @@
-# TaxSaathi website: Phase 1 public site (front end)
+# TaxSaathi website
 
-A static site in plain HTML, CSS and JavaScript. It has no build step and no dependencies.
+A static site built by a small Node script (no dependencies, Node 18+). Every page,
+price and article is rendered into plain HTML in `dist/`, which any static host can serve.
 
-## Run locally
+## Commands
 ```
-python -m http.server 5173
+npm run build      # build the live site into dist/
+npm run preview    # build including draft articles, then serve on http://localhost:5173
+npm run check      # build and fail if any title, description or wording check fails
 ```
-Then open http://localhost:5173. You can also open `index.html` directly in a browser.
 
 ## Where things live
 | File | What it holds |
 |---|---|
-| `assets/js/data.js` | **All prices (PKR, set Nov 2026), tiers, criteria, quote questions, add-ons, rate card, documents to provide, FAQs, deadlines and the Sindh stamp duty rate table.** Edit prices here. |
-| `assets/js/site.js` | Shared header, footer and WhatsApp button, plus the quote engine (`TS.computeQuote`) |
-| `assets/css/style.css` | Design system: brand colours, Manrope, components |
-| `service.html?s=<id>` | One template for every service page, with the "Get your price" panel |
-| `order.html` | Order-flow UI: quote, add-ons, details, documents, review and terms, pay, confirmation. **Preview only; nothing is submitted.** |
-| `_partials/*.part.html` | Source for the simple content pages. Run `python _partials/make.py` after editing them. |
+| `site.config.js` | **Settings (CR-140):** SITE_URL, publish date, phone, WhatsApp, email, address, hours, social links, tax on fee, switches (testimonials, stamp duty calculator), host. |
+| `src/data.js` | **All prices**, tiers, quote questions, add-ons, rate card, Appendix C document lists, deadlines. Edit prices here. |
+| `src/seo.js` | Keyword map (Appendix F): page address, title, description and first paragraph for every service and page. |
+| `src/pages/*.js` | Page templates and fixed wording (policies, FAQ, About, How it works). |
+| `content/knowledge/*.md` | Knowledge articles, one Markdown file each. See `_template.md`. |
+| `assets/js/quote.js` | Quote panel: price engine, quote number, WhatsApp order, copy, email and print. |
+| `assets/js/site.js` | Menu, search, filters, tabs, contact form → WhatsApp. |
+| `assets/js/stamp-duty*.js` | Sindh stamp duty calculator, published only when `SHOW_STAMP_CALCULATOR` is true. |
+| `future/portal/` | Old login and online-order pages, kept for later and not built. |
+
+## Adding a Knowledge article
+Copy `content/knowledge/_template.md`, fill in the header block, write the article, set
+`draft: false` and deploy. The list, category page, home page row, sitemap and feed update.
+
+## Before launch
+1. Set `SITE_URL` (the bought domain) and `PUBLISHED` (launch date) in `site.config.js`.
+2. Review the three draft articles and change `draft: true` to `draft: false`.
+3. Optional: add a photo at `assets/img/abdullah.webp` (or `.jpg`); the About page shows it automatically.
+
+## Hosting (CR-145)
+Vercel's free Hobby plan is for personal, non-commercial use, so use a host whose free plan
+allows a business site, such as **Cloudflare Pages** or **Netlify** (check their current terms).
+- Build command `npm run build`, output folder `dist`.
+- `dist/_redirects` sends old `.html` addresses to the new ones (301), and `dist/_headers` sets caching and security headers. Both hosts read them.
+- HTTPS is automatic on both. For www → main address: on Netlify set `HOST: "netlify"` (the rule is written into `_redirects`); on Cloudflare add a Bulk Redirect or redirect rule in the dashboard.
 
 ## Quote rules
-- Tiered and monthly-plan services: each answer option points to a tier. The job lands in the **highest** tier any answer points to, and those answers become the reason shown to the client.
-- Per-unit services: one answer chooses the unit, and an optional quantity multiplies it.
+- Tiered and monthly plans: the job lands in the **highest** tier any answer points to; those answers are the reason shown.
+- Per-unit and stage-based: one answer picks the unit; an optional quantity multiplies it.
 - No per-client price input exists anywhere. The same answers always give the same price.
-- Government fees always show on separate "At cost" lines.
-
-## Not built yet (needs a backend)
-Accounts, file storage, payments, email and WhatsApp notifications, the admin panel (versioned price rules, orders, re-quotes, logs), the client portal, and Urdu.
+- Government fees always show on separate "At cost" lines. Tax on our fee shows only if `TAX_ON_FEE` is set.
